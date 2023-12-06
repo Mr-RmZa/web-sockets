@@ -16,16 +16,24 @@ server.listen(PORT, () => {
 });
 
 // Setup websocket
+
+const users: any = {};
+
 io.on("connection", (socket) => {
   // console.log(`User connected. ${socket.id}`);
 
   // Listening
-  socket.on("login", (data) => {
-    console.log(`${data} Connected.`);
+
+  socket.on("login", (nickname) => {
+    console.log(`${nickname} Connected.`);
+    users[socket.id] = nickname;
+    io.sockets.emit("online", users);
   });
 
   socket.on("disconnect", () => {
     console.log(`User disconnected.`);
+    delete users[socket.id];
+    io.sockets.emit("online", users);
   });
 
   socket.on("chat message", (data) => {
@@ -34,5 +42,11 @@ io.on("connection", (socket) => {
 
   socket.on("typing", (data) => {
     socket.broadcast.emit("typing", data);
+  });
+
+  socket.on("pvChat", (data) => {
+    console.log(`Private Chat Data: ${data}`);
+    console.log(data.to);
+    io.to(data.to).emit("pvChat", data);
   });
 });
