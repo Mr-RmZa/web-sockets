@@ -33,16 +33,13 @@ messageInput.addEventListener("keypress", () => {
 });
 
 pvChatForm.addEventListener("submit", (e) => {
-  console.log("mmd");
   e.preventDefault();
-
   socket.emit("pvChat", {
     message: pvMessageInput.value,
     name: nickname,
     to: socketId,
     from: socket.id,
   });
-
   $("#pvChat").modal("hide");
   pvMessageInput.value = "";
 });
@@ -55,7 +52,7 @@ socket.on("online", (users) => {
     <li>
     <button
       type="button"
-      class="btn btn-primary"
+      class="btn btn-light mx-2"
       data-bs-toggle="modal"
       data-bs-target="#pvChat"
       data-id=${socketId}
@@ -72,17 +69,13 @@ socket.on("chat message", (data) => {
   feedback.innerHTML = "";
   chatBox.innerHTML += `
   <li class="alert alert-light">
-  <span class="text-dark font-weight-normal"
-    >${data.name}</span
-  >
+  <span class="text-dark font-weight-normal">${data.name}</span>
   <span
     class="text-muted font-italic font-weight-light m-2 float-end"
     style="font-size: 9pt"
     >ساعت 12:00</span
   >
-  <p class="alert alert-dark mt-2 text-dark">
-    ${data.message}
-  </p>
+  <p class="alert alert-dark mt-2 text-dark">${data.message}</p>
 </li>`;
   // chatContainer.scrollTop =
   //   chatContainer.scrollHeight - chatContainer.clientHeight;
@@ -90,6 +83,9 @@ socket.on("chat message", (data) => {
 
 socket.on("typing", (data) => {
   feedback.innerHTML = `<p class="alert alert-warning w-25"><em>${data.name} در حال نوشتن است ... </em></p>`;
+  setTimeout(() => {
+    feedback.innerHTML = "";
+  }, 1000);
 });
 
 socket.on("pvChat", (data) => {
@@ -104,7 +100,6 @@ $("#pvChat").on("show.bs.modal", function (e) {
   var button = $(e.relatedTarget);
   var user = button.data("client");
   socketId = button.data("id");
-
   modalTitle.innerHTML = "ارسال پیام شخصی به :" + user;
   pvChatMessage.style.display = "none";
 });
