@@ -17,7 +17,7 @@ const messageInput = document.getElementById("messageInput"),
 
 let socketId;
 
-socket.emit("login", nickname, roomNumber);
+chatNamespace.emit("login", { nickname, roomNumber });
 
 chatForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -32,12 +32,12 @@ chatForm.addEventListener("submit", (e) => {
 });
 
 messageInput.addEventListener("keypress", () => {
-  socket.emit("typing", { name: nickname, roomNumber });
+  chatNamespace.emit("typing", { name: nickname, roomNumber });
 });
 
 pvChatForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  socket.emit("pvChat", {
+  chatNamespace.emit("pvChat", {
     message: pvMessageInput.value,
     name: nickname,
     to: socketId,
@@ -51,7 +51,7 @@ chatNamespace.on("online", (users) => {
   onlineUsers.innerHTML = "";
 
   for (const socketId in users) {
-    if (roomNumber === users[_socketId].roomNumber) {
+    if (roomNumber === users[socketId].roomNumber) {
       onlineUsers.innerHTML += `
     <li>
     <button
@@ -70,7 +70,7 @@ chatNamespace.on("online", (users) => {
   }
 });
 
-socket.on("chat message", (data) => {
+chatNamespace.on("chat message", (data) => {
   feedback.innerHTML = "";
   chatBox.innerHTML += `
   <li class="alert alert-light">
@@ -86,16 +86,16 @@ socket.on("chat message", (data) => {
   //   chatContainer.scrollHeight - chatContainer.clientHeight;
 });
 
-socket.on("typing", (data) => {
+chatNamespace.on("typing", (data) => {
   if (roomNumber === data.roomNumber) {
-    feedback.innerHTML = `<p class="alert alert-warning w-25"><em>${data.name} در حال نوشتن است ... </em></p>`;
+    feedback.innerHTML = `<p class="alert alert-warning text-center"><em>${data.name} در حال نوشتن است ... </em></p>`;
     setTimeout(() => {
       feedback.innerHTML = "";
     }, 1000);
   }
 });
 
-socket.on("pvChat", (data) => {
+chatNamespace.on("pvChat", (data) => {
   $("#pvChat").modal("show");
   socketId = data.from;
   modalTitle.innerHTML = "دریافت پیام از طرف : " + data.name;
